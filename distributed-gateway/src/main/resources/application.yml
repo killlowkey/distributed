@@ -1,7 +1,7 @@
 server:
-  port: 7000
+  port: 6000
 spring:
   application:
-    name: Order-Service
+    name: Gateway-Service
 registry:
   address: http://localhost:8000

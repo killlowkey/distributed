@@ -3,18 +3,18 @@ package com.distributed.service;
 /**
  * @author Ray
  */
-public interface HeathService {
+public interface HealthService {
     /**
      * 添加心跳检查
      *
      * @param url 服务url
      */
-    void addHeathCheck(String url);
+    void addHealthCheck(String url);
 
     /**
      * 移除服务心跳
      *
      * @param url 服务url
      */
-    void removeHeadCheck(String url);
+    void removeHealthCheck(String url);
 }

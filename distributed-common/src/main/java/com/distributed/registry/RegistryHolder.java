@@ -1,5 +1,6 @@
 package com.distributed.registry;
 
+import com.distributed.annotation.ConditionalOnNotRegistry;
 import com.distributed.entity.Registration;
 import com.distributed.entity.ServerResponse;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -15,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Ray
  */
 @Component
+@ConditionalOnNotRegistry
 @Slf4j
 public class RegistryHolder {
 
@@ -24,13 +28,16 @@ public class RegistryHolder {
     @Value("${server.port}")
     private int port;
 
+    @Value("${registry.address}")
+    private String registryAddress;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     public void register() {
         Registration reg = new Registration(serviceName, String.format("http://localhost:%d", port));
         HttpEntity<Registration> httpEntity = createHttpEntity(reg);
 
-        ResponseEntity<ServerResponse> responseEntity = restTemplate.postForEntity("http://localhost:8000/services",
+        ResponseEntity<ServerResponse> responseEntity = restTemplate.postForEntity(registryAddress + "/services",
                 httpEntity, ServerResponse.class);
         ServerResponse serverResponse = responseEntity.getBody();
 

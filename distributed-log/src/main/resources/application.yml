@@ -6,3 +6,5 @@ spring:
 log:
   file:
     path: distributed.log
+registry:
+  address: http://localhost:8000

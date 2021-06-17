@@ -2,9 +2,8 @@ package com.distributed.service.impl;
 
 import com.distributed.entity.Registration;
 import com.distributed.exception.DistributedException;
-import com.distributed.service.HeathService;
+import com.distributed.service.HealthService;
 import com.distributed.service.RegistryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,7 @@ public class RegistryServiceImpl implements RegistryService {
 
     private final ReentrantLock serviceLock = new ReentrantLock();
     private final List<Registration> services = new ArrayList<>();
-    private HeathService heathService;
+    private HealthService healthService;
     private final ApplicationContext context;
 
     public RegistryServiceImpl(ApplicationContext context) {
@@ -30,15 +29,24 @@ public class RegistryServiceImpl implements RegistryService {
 
     @PostConstruct
     public void init() {
-        this.heathService = context.getBean(HeathService.class);
+        this.healthService = context.getBean(HealthService.class);
     }
 
     @Override
     public void register(Registration reg) {
         serviceLock.lock();
+
+        // 防止多次注册
+        for (Registration registration : services) {
+            if (registration.getServiceUrl().equals(reg.getServiceUrl())) {
+                serviceLock.unlock();
+                return;
+            }
+        }
+
         services.add(reg);
         // 添加服务心跳
-        heathService.addHeathCheck(reg.getServiceUrl());
+        healthService.addHealthCheck(reg.getServiceUrl());
         serviceLock.unlock();
     }
 
@@ -49,7 +57,7 @@ public class RegistryServiceImpl implements RegistryService {
             if (service.getServiceUrl().equals(url)) {
                 removeService(i);
                 // 移除服务心跳
-                heathService.removeHeadCheck(url);
+                healthService.removeHealthCheck(url);
                 return;
             }
         }

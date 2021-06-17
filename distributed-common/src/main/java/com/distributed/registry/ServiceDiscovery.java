@@ -1,9 +1,11 @@
 package com.distributed.registry;
 
+import com.distributed.annotation.ConditionalOnNotRegistry;
 import com.distributed.entity.ServerResponse;
 import com.distributed.exception.DistributedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -13,6 +15,8 @@ import java.util.*;
 /**
  * @author Ray
  */
+@ConditionalOnNotRegistry
+@EnableScheduling
 @Component
 @Slf4j
 public class ServiceDiscovery {
@@ -25,6 +29,9 @@ public class ServiceDiscovery {
     @Value("${spring.application.name}")
     private String applicationName;
 
+    @Value("${registry.address}")
+    private String registryAddress;
+
     @Scheduled(cron = "0/5 * * * * ?")
     public void updateService() {
         if (IGNORE_SERVICE_NAME.equals(applicationName)) {
@@ -32,7 +39,7 @@ public class ServiceDiscovery {
         }
 
         ServerResponse<List<LinkedHashMap<String, String>>> serverResponse =
-                restTemplate.getForObject("http://localhost:8000/services", ServerResponse.class);
+                restTemplate.getForObject(registryAddress + "/services", ServerResponse.class);
         List<LinkedHashMap<String, String>> registrations = serverResponse.getData();
         if (registrations != null && registrations.size() != 0) {
             services.clear();

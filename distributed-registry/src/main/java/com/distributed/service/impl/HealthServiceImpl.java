@@ -2,7 +2,7 @@ package com.distributed.service.impl;
 
 import com.distributed.entity.ServerResponse;
 import com.distributed.exception.DistributedException;
-import com.distributed.service.HeathService;
+import com.distributed.service.HealthService;
 import com.distributed.service.RegistryService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Service
 @RequiredArgsConstructor
-public class HealthServiceImpl implements HeathService {
+public class HealthServiceImpl implements HealthService {
 
     private ThreadPoolExecutor executor;
     private Map<String, HealthRunnable> healthData;
@@ -43,14 +43,14 @@ public class HealthServiceImpl implements HeathService {
     }
 
     @Override
-    public void addHeathCheck(String url) {
+    public void addHealthCheck(String url) {
         HealthRunnable healthRunnable = new HealthRunnable(url, this.registryService, this.healthProperties);
         executor.submit(healthRunnable);
         healthData.put(url, healthRunnable);
     }
 
     @Override
-    public void removeHeadCheck(String url) {
+    public void removeHealthCheck(String url) {
         HealthRunnable healthRunnable = healthData.get(url);
         if (healthRunnable == null) {
             throw new DistributedException(String.format("not found service with %s", url));
@@ -87,7 +87,7 @@ public class HealthServiceImpl implements HeathService {
                 if (!check()) {
                     count++;
                 } else {
-                    log.info(String.format("heath check success with %s", url));
+                    log.info(String.format("health check success with %s", url));
                 }
 
                 if (count >= healthProperties.getFailedCount()) {
@@ -109,10 +109,10 @@ public class HealthServiceImpl implements HeathService {
 
         private boolean check() {
             try {
-                ServerResponse serverResponse = restTemplate.getForObject(url + "/heath", ServerResponse.class);
+                ServerResponse serverResponse = restTemplate.getForObject(url + "/health", ServerResponse.class);
                 return serverResponse.getCode() == 200;
             } catch (Exception ex) {
-                log.warn(String.format("heath check have a error：%s", ex.getMessage()));
+                log.warn(String.format("health check have a error：%s", ex.getMessage()));
                 return false;
             }
         }

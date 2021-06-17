@@ -11,16 +11,17 @@ import java.util.Scanner;
 
 /**
  * @author Ray
+ * @date created in 2021/6/17 19:50
  */
 @SpringBootApplication
-@RequiredArgsConstructor
 @Slf4j
-public class OrderServiceApplication implements CommandLineRunner {
+@RequiredArgsConstructor
+public class GatewayApplication implements CommandLineRunner {
 
     private final RegistryHolder registryHolder;
 
     public static void main(String[] args) {
-        SpringApplication.run(OrderServiceApplication.class, args);
+        SpringApplication.run(GatewayApplication.class, args);
     }
 
     @Override

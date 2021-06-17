@@ -13,6 +13,7 @@
         <module>distributed-registry</module>
         <module>distributed-log</module>
         <module>distributed-order</module>
+        <module>distributed-gateway</module>
     </modules>
 
     <properties>

@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HeathController {
 
-    @GetMapping("/heath")
-    public <T> ServerResponse<T> heath() {
+    @GetMapping("/health")
+    public <T> ServerResponse<T> health() {
         return ServerResponse.success("success");
     }
 
