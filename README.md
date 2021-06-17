@@ -10,12 +10,13 @@
 * 服务注册
 * 服务发现
 * 状态检测
+* 网关路由
 
 ## 运行
 1. 进入 distributed-registry 模块启动，运行注册中心
 2. 随后启动 distributed-gateway（网关）、distributed-log（日志服务）、distributed-service（订单服务）
 
-发送一个保存日志的 post 请求，请求通过网关转发到日志服务，最终日志服务将日志持久化本地
+发送保存日志的 post 请求，请求通过网关转发到日志服务，最终日志服务将日志持久化本地
 ``` sh
 curl --location --request POST 'http://localhost:6000/log' \
 --header 'Content-Type: application/json' \
