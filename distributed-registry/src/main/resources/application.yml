@@ -1,0 +1,10 @@
+server:
+  port: 8000
+  address: localhost
+spring:
+  application:
+    name: Registry-Service
+health:
+  failed-count: 3
+  interval: 3
+  second: 60
