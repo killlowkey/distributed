@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -110,9 +111,9 @@ public class HealthServiceImpl implements HealthService {
         private boolean check() {
             try {
                 ServerResponse serverResponse = restTemplate.getForObject(url + "/health", ServerResponse.class);
-                return serverResponse.getCode() == 200;
+                return Objects.requireNonNull(serverResponse).getCode() == 200;
             } catch (Exception ex) {
-                log.warn(String.format("health check have a error：%s", ex.getMessage()));
+                log.error(String.format("health check have a error：%s", ex.getMessage()));
                 return false;
             }
         }

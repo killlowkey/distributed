@@ -32,15 +32,20 @@ public class ServiceDiscovery {
     @Value("${registry.address}")
     private String registryAddress;
 
-    @Scheduled(cron = "0/5 * * * * ?")
+    // 每隔5s从注册中心拉取服务
+    @Scheduled(initialDelay = 0L, fixedDelay = 5L * 1000)
     public void updateService() {
         if (IGNORE_SERVICE_NAME.equals(applicationName)) {
             return;
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug("pull services from RegistryCenter");
+        }
+
         ServerResponse<List<LinkedHashMap<String, String>>> serverResponse =
                 restTemplate.getForObject(registryAddress + "/services", ServerResponse.class);
-        List<LinkedHashMap<String, String>> registrations = serverResponse.getData();
+        List<LinkedHashMap<String, String>> registrations = Objects.requireNonNull(serverResponse).getData();
         if (registrations != null && registrations.size() != 0) {
             services.clear();
             registrations.forEach(map -> {

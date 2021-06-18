@@ -1,27 +1,26 @@
-package com.distributed;
+package com.distributed.registry;
 
-import com.distributed.registry.RegistryHolder;
+import com.distributed.annotation.ConditionalOnNotRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
 
 /**
+ * 服务注册
+ *
  * @author Ray
+ * @date created in 2021/6/18 10:17
  */
-@SpringBootApplication
+@Component
 @RequiredArgsConstructor
+@ConditionalOnNotRegistry
 @Slf4j
-public class OrderServiceApplication implements CommandLineRunner {
+public class RegistryServiceHook implements CommandLineRunner {
 
     private final RegistryHolder registryHolder;
-
-    public static void main(String[] args) {
-        SpringApplication.run(OrderServiceApplication.class, args);
-    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -33,4 +32,5 @@ public class OrderServiceApplication implements CommandLineRunner {
             System.exit(0);
         }
     }
+
 }

@@ -5,13 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author Ray
- * @date created in 2021/6/17 19:50
  */
 @SpringBootApplication
-public class GatewayApplication {
+public class OrderApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
+        SpringApplication.run(OrderApplication.class, args);
     }
 
 }

@@ -5,13 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author Ray
- * @date created in 2021/6/17 19:50
+ * @date created in 2021/6/18 10:16
  */
 @SpringBootApplication
-public class GatewayApplication {
+public class AuthApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GatewayApplication.class, args);
+        SpringApplication.run(AuthApplication.class, args);
     }
 
 }

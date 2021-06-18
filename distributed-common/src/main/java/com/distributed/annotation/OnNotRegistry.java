@@ -12,7 +12,6 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * @author Ray
  * @date created in 2021/6/17 20:05
  */
-@ConditionalOnClass
 public class OnNotRegistry implements Condition {
 
     private static final String REGISTRY_SERVICE_NAME = "Registry-Service";

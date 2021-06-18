@@ -5,3 +5,10 @@ spring:
     name: Gateway-Service
 registry:
   address: http://localhost:8000
+limit:
+  count: 5
+  second: 60
+# debug 级别
+logging:
+  level:
+    com.distributed.filter: debug
