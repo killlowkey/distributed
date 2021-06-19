@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Ray
@@ -23,12 +22,12 @@ public class OnExclude implements Condition {
 
         String appName = getCurrentApplicationName(context.getEnvironment());
         MultiValueMap<String, Object> attrs = metadata.getAllAnnotationAttributes(ConditionalOnExclude.class.getName());
-        List<Services> serviceList = Objects.requireNonNull(attrs).get("value")
+        List<ServiceEnum> serviceList = Objects.requireNonNull(attrs).get("value")
                 .stream()
-                .flatMap(array -> Arrays.stream((Services[])array))
+                .flatMap(array -> Arrays.stream((ServiceEnum[])array))
                 .collect(Collectors.toList());
-        for (Services service : serviceList) {
-            if (service.getServiceName().equalsIgnoreCase(appName)) {
+        for (ServiceEnum serviceEnum : serviceList) {
+            if (serviceEnum.getServiceName().equalsIgnoreCase(appName)) {
                 return false;
             }
         }

@@ -1,14 +1,21 @@
 package com.distributed.controller;
 
+import com.distributed.MachineHolder;
+import com.distributed.entity.MachineInfo;
 import com.distributed.entity.Registration;
-import com.distributed.registry.RegistryHolder;
 import com.distributed.entity.ServerResponse;
+import com.distributed.entity.Service;
+import com.distributed.registry.RegistryHolder;
 import com.distributed.service.RegistryService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Ray
@@ -20,6 +27,7 @@ import java.util.List;
 public class RegistryController {
 
     private final RegistryService registryService;
+    private final MachineHolder machineHolder;
 
     @PostMapping
     public <T> ServerResponse<T> register(@RequestBody Registration reg) {
@@ -41,8 +49,43 @@ public class RegistryController {
     }
 
     @GetMapping
-    public ServerResponse<List<Registration>> services() {
-        return ServerResponse.success(registryService.findAllServices());
+    public ServerResponse<List<Service>> services() {
+        List<Registration> registrationList = registryService.findAllServices();
+        Map<String, List<Service.ServiceData>> temp = new HashMap<>();
+
+        registrationList.forEach(registration -> {
+
+            String serviceName = registration.getServiceName();
+            String url = registration.getServiceUrl();
+            MachineInfo machineInfo = machineHolder.getMachineInfo(url);
+            Service.ServiceData data = new Service.ServiceData(url, machineInfo);
+
+            List<Service.ServiceData> serviceData = temp.get(serviceName);
+            if (serviceData == null) {
+                temp.put(serviceName, new ArrayList<>(List.of(data)));
+            } else {
+                serviceData.add(data);
+            }
+
+//            for (Service service : result) {
+//                if (service.getServiceName().equals(serviceName)) {
+//                    service.getData().add(new Service.ServiceData(url, machineInfo));
+//                    flag.set(true);
+//                }
+//            }
+//
+//            if (!flag.get()) {
+//                List<Service.ServiceData> data = new ArrayList<>();
+//                data.add(new Service.ServiceData(url, machineInfo));
+//                result.add(new Service(serviceName, data));
+//            }
+
+        });
+
+        List<Service> result = new ArrayList<>();
+        temp.forEach((name, data) -> result.add(new Service(name, data)));
+
+        return ServerResponse.success(result);
     }
 
 }

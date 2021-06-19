@@ -1,7 +1,7 @@
 package com.distributed.auth;
 
 import com.distributed.annotation.ConditionalOnExclude;
-import com.distributed.annotation.Services;
+import com.distributed.annotation.ServiceEnum;
 import com.distributed.entity.ServerResponse;
 import com.distributed.util.JwtUtils;
 import com.distributed.util.WebUtils;
@@ -23,7 +23,7 @@ import java.io.IOException;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Component
 @ConditionalOnExclude({
-        Services.REGISTRY, Services.GATEWAY
+        ServiceEnum.REGISTRY, ServiceEnum.GATEWAY
 })
 public class TokenFilter extends GenericFilter {
     @Override

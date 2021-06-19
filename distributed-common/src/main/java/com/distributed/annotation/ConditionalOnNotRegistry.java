@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@ConditionalOnExclude(Services.REGISTRY)
+@ConditionalOnExclude(ServiceEnum.REGISTRY)
 //@Conditional(OnNotRegistry.class)
 public @interface ConditionalOnNotRegistry {
 

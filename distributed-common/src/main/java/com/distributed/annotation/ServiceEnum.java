@@ -4,7 +4,7 @@ package com.distributed.annotation;
  * @author Ray
  * @date created in 2021/6/18 11:51
  */
-public enum Services {
+public enum ServiceEnum {
 
     REGISTRY("Registry-Service"),
     AUTH("Auth-Service"),
@@ -14,7 +14,7 @@ public enum Services {
 
     private final String serviceName;
 
-    Services(String serviceName) {
+    ServiceEnum(String serviceName) {
         this.serviceName = serviceName;
     }
 

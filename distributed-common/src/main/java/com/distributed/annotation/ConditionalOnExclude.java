@@ -13,5 +13,5 @@ import java.lang.annotation.*;
 @Documented
 @Conditional(OnExclude.class)
 public @interface ConditionalOnExclude {
-    Services[] value() default {};
+    ServiceEnum[] value() default {};
 }
