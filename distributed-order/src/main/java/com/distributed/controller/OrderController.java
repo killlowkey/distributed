@@ -36,7 +36,7 @@ public class OrderController {
     public ServerResponse<Order> placeOrder(@RequestBody OrderDto orderDto) {
         Order order = new Order(new Random().nextInt(Integer.MAX_VALUE), orderDto.getName(), 34.65f);
         // 远程调用 Log 服务
-        String logServiceUrl = serviceDiscovery.getService("Log-Service");
+        String logServiceUrl = serviceDiscovery.getServiceUrl("Log-Service");
         LogDto logDto = new LogDto(serviceName, String.format("订单[%s]下单成功", order.getId()));
         restTemplate.postForObject(logServiceUrl + "/log", createHttpEntity(logDto), ServerResponse.class);
         return ServerResponse.success(order);

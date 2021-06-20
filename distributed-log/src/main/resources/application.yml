@@ -8,3 +8,7 @@ log:
     path: distributed.log
 registry:
   address: http://localhost:8000
+# ROTATION：轮训、RANDOM：随机、AVAILABLE：高可用
+service:
+  discovery:
+    strategy: AVAILABLE

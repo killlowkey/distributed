@@ -56,7 +56,7 @@ public class RouterFilter implements GatewayFilter {
         String temp = path.split("/")[1];
         String serviceName = temp.substring(0, 1).toUpperCase() + temp.substring(1) + "-Service";
         // 获取服务的 url
-        String serviceUrl = serviceDiscovery.getService(serviceName);
+        String serviceUrl = serviceDiscovery.getServiceUrl(serviceName);
 
         String targetUrl = serviceUrl + path;
         Request okRequest = new Request.Builder()

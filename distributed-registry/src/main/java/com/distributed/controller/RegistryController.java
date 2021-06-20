@@ -1,10 +1,7 @@
 package com.distributed.controller;
 
 import com.distributed.MachineHolder;
-import com.distributed.entity.MachineInfo;
-import com.distributed.entity.Registration;
-import com.distributed.entity.ServerResponse;
-import com.distributed.entity.Service;
+import com.distributed.entity.*;
 import com.distributed.registry.RegistryHolder;
 import com.distributed.service.RegistryService;
 import lombok.AllArgsConstructor;
@@ -15,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Ray
@@ -51,16 +47,16 @@ public class RegistryController {
     @GetMapping
     public ServerResponse<List<Service>> services() {
         List<Registration> registrationList = registryService.findAllServices();
-        Map<String, List<Service.ServiceData>> temp = new HashMap<>();
+        Map<String, List<ServiceData>> temp = new HashMap<>();
 
         registrationList.forEach(registration -> {
 
             String serviceName = registration.getServiceName();
             String url = registration.getServiceUrl();
             MachineInfo machineInfo = machineHolder.getMachineInfo(url);
-            Service.ServiceData data = new Service.ServiceData(url, machineInfo);
+            ServiceData data = new ServiceData(url, machineInfo);
 
-            List<Service.ServiceData> serviceData = temp.get(serviceName);
+            List<ServiceData> serviceData = temp.get(serviceName);
             if (serviceData == null) {
                 temp.put(serviceName, new ArrayList<>(List.of(data)));
             } else {

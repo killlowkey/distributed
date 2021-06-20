@@ -4,18 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 /**
  * @author Ray
- * @date created in 2021/6/19 19:41
+ * @date created in 2021/6/20 9:31
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Service {
-
-    private String serviceName;
-    private List<ServiceData> data;
-
+public class ServiceData {
+    private String url;
+    private MachineInfo machineInfo;
 }
