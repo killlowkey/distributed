@@ -1,6 +1,7 @@
 package com.distributed.controller;
 
 import com.distributed.MachineHolder;
+import com.distributed.auth.AuthHolder;
 import com.distributed.entity.*;
 import com.distributed.registry.RegistryHolder;
 import com.distributed.service.RegistryService;
@@ -24,12 +25,14 @@ public class RegistryController {
 
     private final RegistryService registryService;
     private final MachineHolder machineHolder;
+    private final AuthHolder authHolder;
 
     @PostMapping
-    public <T> ServerResponse<T> register(@RequestBody Registration reg) {
-        registryService.register(reg);
+    public ServerResponse<Map<String, String>> register(@RequestBody Registration reg) {
+        this.registryService.register(reg);
         log.info(String.format("Adding service: %s with URL: %s", reg.getServiceName(), reg.getServiceUrl()));
-        return ServerResponse.success(reg.getServiceName() + " 服务注册成功");
+        Map<String, String> result = Map.of("token", authHolder.generateToken(reg.getServiceUrl()));
+        return ServerResponse.success(result);
     }
 
     @DeleteMapping
@@ -39,7 +42,8 @@ public class RegistryController {
             return ServerResponse.error("url不符合要求");
         }
 
-        registryService.unregister(url);
+        this.registryService.unregister(url);
+        this.authHolder.removeToken(url);
         log.info(String.format("Removing service at URL：%s", url));
         return ServerResponse.success("取消注册服务成功");
     }
@@ -62,19 +66,6 @@ public class RegistryController {
             } else {
                 serviceData.add(data);
             }
-
-//            for (Service service : result) {
-//                if (service.getServiceName().equals(serviceName)) {
-//                    service.getData().add(new Service.ServiceData(url, machineInfo));
-//                    flag.set(true);
-//                }
-//            }
-//
-//            if (!flag.get()) {
-//                List<Service.ServiceData> data = new ArrayList<>();
-//                data.add(new Service.ServiceData(url, machineInfo));
-//                result.add(new Service(serviceName, data));
-//            }
 
         });
 

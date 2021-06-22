@@ -6,11 +6,14 @@ import com.distributed.entity.ServerResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 /**
  * @author Ray
@@ -18,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 @ConditionalOnNotRegistry
 @Slf4j
+@RequiredArgsConstructor
 public class RegistryHolder {
 
     @Value("${spring.application.name}")
@@ -30,10 +34,12 @@ public class RegistryHolder {
     private String registryAddress;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ServiceDiscovery serviceDiscovery;
 
+    @SuppressWarnings("all")
     public void register() {
         Registration reg = new Registration(serviceName, String.format("http://localhost:%d", port));
-        HttpEntity<Registration> httpEntity = createHttpEntity(reg);
+        HttpEntity<Registration> httpEntity = createHttpEntity("", reg);
 
         ResponseEntity<ServerResponse> responseEntity = restTemplate.postForEntity(registryAddress + "/services",
                 httpEntity, ServerResponse.class);
@@ -44,12 +50,17 @@ public class RegistryHolder {
             System.exit(0);
         }
 
+        String token = ((Map<String, String>) serverResponse.getData()).get("token");
+        log.info("token: {}", token);
+        serviceDiscovery.setToken(token);
+
         log.info(String.format("success register %s service", serviceName));
     }
 
+    @SuppressWarnings("all")
     public void unregister() {
         String url = String.format("http://localhost:%s", port);
-        HttpEntity<UnregisterDto> httpEntity = createHttpEntity(new UnregisterDto(url));
+        HttpEntity<UnregisterDto> httpEntity = createHttpEntity(serviceDiscovery.removeToken(), new UnregisterDto(url));
 
         ResponseEntity<ServerResponse> responseEntity = restTemplate.exchange("http://localhost:8000/services",
                 HttpMethod.DELETE, httpEntity, ServerResponse.class);
@@ -61,8 +72,9 @@ public class RegistryHolder {
         log.info(String.format("success unregister with %s", url));
     }
 
-    private <T> HttpEntity<T> createHttpEntity(T body) {
+    private <T> HttpEntity<T> createHttpEntity(String token, T body) {
         HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.set("token", token);
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(body, httpHeaders);
     }

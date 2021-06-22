@@ -1,9 +1,10 @@
 package com.distributed.service.impl;
 
 import com.distributed.MachineHolder;
+import com.distributed.auth.AuthHolder;
+import com.distributed.entity.MachineInfo;
 import com.distributed.entity.ServerResponse;
 import com.distributed.exception.DistributedException;
-import com.distributed.entity.MachineInfo;
 import com.distributed.service.HealthService;
 import com.distributed.service.RegistryService;
 import lombok.Data;
@@ -38,6 +39,7 @@ public class HealthServiceImpl implements HealthService {
     private final HealthProperties healthProperties;
     private final AtomicInteger integer = new AtomicInteger();
     private final MachineHolder machineHolder;
+    private final AuthHolder authHolder;
 
     @PostConstruct
     public void init() {
@@ -49,7 +51,7 @@ public class HealthServiceImpl implements HealthService {
     @Override
     public void addHealthCheck(String url) {
         HealthRunnable healthRunnable = new HealthRunnable(url, this.registryService, this.healthProperties,
-                machineHolder);
+                machineHolder, authHolder);
         executor.submit(healthRunnable);
         healthData.put(url, healthRunnable);
     }
@@ -75,16 +77,19 @@ public class HealthServiceImpl implements HealthService {
         private final HealthProperties healthProperties;
         private final RestTemplate restTemplate = new RestTemplate();
         private final MachineHolder machineHolder;
+        private AuthHolder authHolder;
         private Date resetDate = new Date();
         private boolean flag = true;
         private int count;
 
         public HealthRunnable(String url, RegistryService registryService,
-                              HealthProperties healthProperties, MachineHolder machineHolder) {
+                              HealthProperties healthProperties, MachineHolder machineHolder,
+                              AuthHolder authHolder) {
             this.url = url;
             this.registryService = registryService;
             this.healthProperties = healthProperties;
             this.machineHolder = machineHolder;
+            this.authHolder = authHolder;
         }
 
         @SneakyThrows
@@ -102,6 +107,8 @@ public class HealthServiceImpl implements HealthService {
                     registryService.unregister(url);
                     // 移除机器状态
                     machineHolder.removeMachineInfo(url);
+                    // 移除token
+                    authHolder.removeToken(url);
                     log.info(String.format("Removing service at URL：%s", url));
                     break;
                 }
@@ -116,6 +123,7 @@ public class HealthServiceImpl implements HealthService {
             }
         }
 
+        @SuppressWarnings("all")
         private boolean sendHealthCheck() {
             try {
                 ServerResponse<Map<String, Object>> serverResponse =
