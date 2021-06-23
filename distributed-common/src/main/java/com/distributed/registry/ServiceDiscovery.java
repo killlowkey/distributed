@@ -41,6 +41,9 @@ public class ServiceDiscovery {
     @Value("${registry.address}")
     private String registryAddress;
 
+    @Value("${server.port}")
+    private int port;
+
     @PostConstruct
     public void init() {
         log.info("matcher name {}", matcher.getClass().getSimpleName());
@@ -50,7 +53,7 @@ public class ServiceDiscovery {
     // 每隔5s从注册中心拉取服务
     @Scheduled(initialDelay = 0L, fixedDelay = 5L * 1000)
     @SuppressWarnings("all")
-    public void updateService() {
+    public void pullService() {
         if (IGNORE_SERVICE_NAME.equals(applicationName)) {
             return;
         }
@@ -61,6 +64,7 @@ public class ServiceDiscovery {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("token", token);
+        headers.set("url", "http://localhost:" + port);
         HttpEntity httpEntity = new HttpEntity(headers);
         ServerResponse<List<LinkedHashMap<String, Object>>> serverResponse =
                 restTemplate.exchange(registryAddress + "/services", HttpMethod.GET, httpEntity, ServerResponse.class)
@@ -72,11 +76,11 @@ public class ServiceDiscovery {
             registrations.forEach(map -> {
                 String serviceName = (String) map.get("serviceName");
                 List<ServiceData> serviceData = services.get(serviceName);
-                ServiceData data = getServiceData((List<Map<String, Object>>) map.get("data"));
+                List<ServiceData> data = getServiceData((List<Map<String, Object>>) map.get("data"));
                 if (serviceData == null) {
-                    services.put(serviceName, new ArrayList<>(List.of(data)));
+                    services.put(serviceName, new ArrayList<>(data));
                 } else {
-                    serviceData.add(data);
+                    serviceData.addAll(data);
                 }
             });
             log.trace("update service success");
@@ -98,11 +102,16 @@ public class ServiceDiscovery {
     }
 
     @SuppressWarnings("all")
-    private ServiceData getServiceData(List<Map<String, Object>> data) {
-        Map<String, Object> serviceInfo = data.get(0);
-        String url = (String) serviceInfo.get("url");
-        Map<String, Object> machineInfo = (Map<String, Object>) serviceInfo.get("machineInfo");
-        return new ServiceData(url, new MachineInfo(machineInfo));
+    private List<ServiceData> getServiceData(List<Map<String, Object>> data) {
+        List<ServiceData> result = new ArrayList<>();
+        data.forEach(serviceInfo -> {
+            String url = (String) serviceInfo.get("url");
+            Map<String, Object> machineInfo = (Map<String, Object>) serviceInfo.get("machineInfo");
+            ServiceData serviceData = new ServiceData(url, new MachineInfo(machineInfo));
+            result.add(serviceData);
+        });
+
+        return result;
     }
 
     /**

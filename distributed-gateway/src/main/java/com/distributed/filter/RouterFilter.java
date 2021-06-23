@@ -41,7 +41,6 @@ public class RouterFilter implements GatewayFilter {
         }
 
         route(request, response);
-        chain.doFilter(request, response);
     }
 
     /**

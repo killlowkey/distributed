@@ -75,6 +75,7 @@ public class RegistryHolder {
     private <T> HttpEntity<T> createHttpEntity(String token, T body) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("token", token);
+        httpHeaders.set("url", "http://localhost:" + port);
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(body, httpHeaders);
     }

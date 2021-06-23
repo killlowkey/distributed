@@ -21,18 +21,9 @@ public class AuthHolder {
         return token;
     }
 
-    public boolean authToken(/*String serviceUrl,*/ String token) {
-
-//        String resToken = this.tokenData.getOrDefault(serviceUrl, "");
-//        return resToken.equals(token);
-
-        for (String value : tokenData.values()) {
-            if (value.equals(token)) {
-                return true;
-            }
-        }
-
-        return false;
+    public boolean authToken(String serviceUrl, String token) {
+        String resToken = this.tokenData.getOrDefault(serviceUrl, "");
+        return resToken.equals(token);
     }
 
     public void removeToken(String serviceUrl) {

@@ -45,8 +45,14 @@ public class AuthFilter extends GenericFilter {
             return;
         }
 
-        // 认证 token，本应该是获取服务地址+token进行授权，这里简化流程
-        if (!authHolder.authToken(token)) {
+        String url = servletRequest.getHeader("url");
+        if (!StringUtils.hasText(url)) {
+            WebUtils.writeBody(servletResponse, ServerResponse.error("not found url header"));
+            return;
+        }
+
+        // 认证 token
+        if (!authHolder.authToken(url, token)) {
             WebUtils.writeBody(servletResponse, ServerResponse.error("token error"));
             return;
         }
